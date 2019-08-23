@@ -45,18 +45,43 @@ func (ic iCompleter) Do(line []rune, pos int) (newLine [][]rune, length int) {
 }
 
 func (ic iCompleter) getWords(prefix string, w []string) (s []string) {
-	cmd, args := ic.cmd.FindCmd(w)
+	cmd, optCmdValueMap, args := ic.cmd.FindCmd(w)
+
+	for optCmd, value := range optCmdValueMap {
+		if completed, err := optCmd.IsValid(value); err != nil {
+			return s
+		} else if !completed {
+			if optCmd.CompleterWithPrefix != nil {
+				return optCmd.CompleterWithPrefix(prefix, []string{value})
+			}
+			if optCmd.Completer != nil {
+				return optCmd.Completer([]string{value})
+			}
+			for k := range optCmd.children {
+				s = append(s, k)
+				return s
+			}
+			for k := range cmd.optionalChildren {
+				s = append(s, k)
+			}
+		}
+	}
+
 	if cmd == nil {
 		cmd, args = ic.cmd, w
 	}
 	if cmd.CompleterWithPrefix != nil {
 		return cmd.CompleterWithPrefix(prefix, args)
 	}
-	if cmd.Completer != nil {
+	if cmd.Completer != nil  {
 		return cmd.Completer(args)
 	}
+
 	for k := range cmd.children {
 		s = append(s, k)
 	}
-	return
+	for k := range cmd.optionalChildren {
+		s = append(s, k)
+	}
+	return s
 }

@@ -266,15 +266,22 @@ func (s *Shell) handleCommand(str []string) (bool, error) {
 			str[i] = strings.ToLower(str[i])
 		}
 	}
-	cmd, args := s.rootCmd.FindCmd(str)
+	cmd, optCmdArgMap, args := s.rootCmd.FindCmd(str)
 	if cmd == nil {
 		return false, nil
 	}
+
 	// trigger help if func is not registered or auto help is true
 	if cmd.Func == nil || (s.autoHelp && len(args) == 1 && args[0] == "help") {
 		s.Println(cmd.HelpText())
 		return true, nil
 	}
+
+	for optCmd, optArgs := range optCmdArgMap {
+		c := newContext(s, optCmd, []string{optArgs})
+		optCmd.Func(c)
+	}
+
 	c := newContext(s, cmd, args)
 	cmd.Func(c)
 	return true, c.err

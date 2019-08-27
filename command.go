@@ -3,7 +3,6 @@ package ishell
 import (
 	"bytes"
 	"fmt"
-	"github.com/pkg/errors"
 	"sort"
 	"text/tabwriter"
 )
@@ -230,18 +229,18 @@ func (c Cmd) FindOptionalCmd(args []string) (*Cmd, []string) {
 }
 
 // IsValid checks if a command's argument value given is valid and complete.
-func (c Cmd) IsValid(argValue string) (bool, error) {
-	if c.Completer == nil {
-		return false, errors.New("Completer must be specified for cmd")
-	}
-	values := c.Completer(nil)
-	valid := false
-	for _, completedValue := range values {
-		if argValue == completedValue {
-			valid = true
+func (c Cmd) IsValid(argValue string) bool {
+	if c.Completer != nil {
+		values := c.Completer(nil)
+		valid := false
+		for _, completedValue := range values {
+			if argValue == completedValue {
+				valid = true
+			}
 		}
+		return valid
 	}
-	return valid, nil
+	return true
 }
 
 type cmdSorter []*Cmd

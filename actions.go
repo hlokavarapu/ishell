@@ -123,7 +123,7 @@ func (s *shellActionsImpl) Println(val ...interface{}) {
 
 func (s *shellActionsImpl) Print(val ...interface{}) {
 	s.reader.buf.Truncate(0)
-	fmt.Fprint(s.reader.buf, val...)
+	//fmt.Fprint(s.reader.buf, val...)
 	fmt.Fprint(s.writer, val...)
 }
 

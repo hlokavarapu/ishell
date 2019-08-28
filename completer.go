@@ -48,9 +48,7 @@ func (ic iCompleter) getWords(prefix string, w []string) (s []string) {
 	cmd, optCmdValueMap, args := ic.cmd.FindCmd(w)
 
 	for optCmd, value := range optCmdValueMap {
-		if completed, err := optCmd.IsValid(value); err != nil {
-			return s
-		} else if !completed {
+		if !optCmd.IsValid(value) {
 			if optCmd.CompleterWithPrefix != nil {
 				return optCmd.CompleterWithPrefix(prefix, []string{value})
 			}

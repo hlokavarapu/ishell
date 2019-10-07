@@ -71,7 +71,7 @@ func (ic iCompleter) getWords(prefix string, w []string) (s []string) {
 	if cmd.CompleterWithPrefix != nil {
 		return cmd.CompleterWithPrefix(prefix, args)
 	}
-	if cmd.Completer != nil  {
+	if cmd.Completer != nil {
 		return cmd.Completer(args)
 	}
 
